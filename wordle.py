@@ -16,7 +16,10 @@ def _cli_parse(args: argparse.Namespace):
     dictionary = None
     if args.dictionary is not None:
         dictionary = set(_ for _ in args.dictionary.split())
-    for guess in guess_generator(args.word, args.available, args.present, dictionary):
+    present = ''
+    if args.present is not None:
+        present = args.present
+    for guess in guess_generator(args.word, args.available, present, dictionary):
         print(guess)
 
 def _permgen(p: str) -> Generator[str, None, None]:
