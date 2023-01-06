@@ -13,14 +13,27 @@ from typing import Generator
 
 def _cli_parse(args: argparse.Namespace):
     """Feed command line data to guess generator and print guesses."""
+    # parse dictionary input
     dictionary = None
     if args.dictionary is not None:
         dictionary = set(_ for _ in args.dictionary.split())
-    present = ''
-    if args.present is not None:
-        present = args.present
-    for guess in guess_generator(args.word, args.available, present, dictionary):
-        print(guess)
+    
+    # handle 'present' being absent
+    present = args.present
+    if present is None:
+        present = ''
+    
+    # set number of columns
+    columns = 1
+    if args.columns is not None:
+        columns = int(args.columns)
+
+    # print print guesses
+    for i, guess in enumerate(guess_generator(args.word, args.available, present, dictionary)):
+        if (i+1) % columns:
+            print(guess, end='  ')
+        else:
+            print(guess)
 
 def _permgen(p: str) -> Generator[str, None, None]:
     """Generate permutation strings instead of tuples."""
@@ -78,22 +91,25 @@ def guess_generator(previous_guess: str, available_letters: str, required_letter
 if __name__ == '__main__':
     # provide command line interface
     parser = argparse.ArgumentParser()
-    parser.add_argument('word', help="A 5-character string\
-    representing your previous guess. Use \"?\" character as a\
-    placeholder for unknown letters.")
-    parser.add_argument('available', help="A string of all possible\
-    letters that can still be added to the word (minus those letters\
-    known to be `present`). If it's possible for a letter to be\
-    included twice, that letter should be in the `available` string\
-    twice, etc. If you know a letter is in the word somewhere, it\
-    should be provided as `present` instead of `available`. If you\
-    *know* a letter is in the word somewhere ONCE, and it *might* be\
-    in the word TWICE, it should be in `available` once and `present`\
-    once.")
-    parser.add_argument('--present', help="An optional string\
-    of letters that we know are in the word somewhere, but we don't\
-    know their position in the word yet.")
-    parser.add_argument('--dictionary', help="An optional list of all\
-    possible words. Surround by quotes and separate with spaces.")
+    parser.add_argument('word', help="""A 5-character string
+       representing your previous guess. Use '?' character as a
+       placeholder for unknown letters.""")
+    parser.add_argument('available', help="""A string of all possible
+       letters that can still be added to the word (minus those letters
+       known to be `present`). If it's possible for a letter to be
+       included twice, that letter should be in the `available` string
+       twice, etc. If you know a letter is in the word somewhere, it
+       should be provided as `present` instead of `available`. If you
+       *know* a letter is in the word somewhere ONCE, and it *might* be
+       in the word TWICE, it should be in `available` once and `present`
+       once.""")
+    parser.add_argument('--present', help="""An optional string of
+       letters that we know are in the word somewhere, but we don't know
+       their position in the word yet.""")
+    parser.add_argument('--dictionary', help="""An optional list of
+       all possible words. Surround by quotes and separate with
+       spaces.""")
+    parser.add_argument('--columns', help="""Print the results in this
+       number of columns.""")
     args = parser.parse_args()
     _cli_parse(args)
