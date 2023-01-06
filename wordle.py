@@ -34,6 +34,10 @@ def _cli_parse(args: argparse.Namespace):
             print(guess, end='  ')
         else:
             print(guess)
+    if (i+1) % columns:
+        print()
+    print('---')
+    print('Generated', i+1, 'guesses.', end='')
 
 def _permgen(p: str) -> Generator[str, None, None]:
     """Generate permutation strings instead of tuples."""
